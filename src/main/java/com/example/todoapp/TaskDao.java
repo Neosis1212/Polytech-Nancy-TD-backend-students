@@ -3,6 +3,8 @@ package com.example.todoapp;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
+import java.util.List;
+import java.util.ArrayList;
 
 /**
  * Data Access Object for {@link Task} model.
@@ -25,6 +27,22 @@ public class TaskDao {
     public Task save(Task task) {
         storage.put(task.id(), task);
         return task;
+    }
+
+    /**
+     * Retrieve all tasks from memory.
+     * @return a list containing all tasks.
+     */
+    public List<Task> findAll() {
+        return new ArrayList<>(storage.values());
+    }
+
+    /**.
+     * @param id int tid of the task.
+     * @return boolean succes of the removal operation.
+     */
+    public boolean delete(int id) {
+        return storage.remove(id) != null;
     }
 
     /**

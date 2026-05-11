@@ -11,6 +11,7 @@ import java.net.InetSocketAddress;
 import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.List;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.Objects.nonNull;
@@ -27,11 +28,11 @@ public class Application {
     public static void main(String[] args) throws Exception {
         log.info("In-memory repository initialised");
 
-        HttpServer server = HttpServer.create(new InetSocketAddress(8080), 0);
+        HttpServer server = HttpServer.create(new InetSocketAddress(8081), 0);
         server.createContext("/tasks", Application::handleTasks);
         server.setExecutor(null);
         server.start();
-        log.info("HTTP server started on http://localhost:8080");
+        log.info("HTTP server started on http://localhost:8081");
     }
 
     private static void handleTasks(HttpExchange exchange) throws IOException {
@@ -45,6 +46,20 @@ public class Application {
 
             exchange.getResponseHeaders().add("Location", "/tasks/" + createdTask.id());
             sendResponse(exchange, 201, JsonUtils.serialize(createdTask));
+            return;
+        }
+
+        if ("GET".equals(method) && "/tasks".equals(path)) {
+            List<Task> tasks = dao.findAll();
+            String query = exchange.getRequestURI().getQuery();
+            if (nonNull(query) && query.contains("todo-only=true")) {
+                tasks = tasks.stream().filter(t -> !t.done()).toList();
+            }
+            if (tasks.isEmpty()) {
+                sendResponse(exchange, 204, null);
+            } else {
+                sendResponse(exchange, 200, JsonUtils.serialize(tasks));
+            }
             return;
         }
         //endregion
@@ -63,6 +78,34 @@ public class Application {
             return;
         }
         //endregion
+        // Manage DELETE /tasks/{id}
+        if ("DELETE".equals(method) && m.matches()) {
+            int id = Integer.parseInt(m.group(1));
+            if (dao.delete(id)) {
+                sendResponse(exchange, 204, null);
+            } else {
+                sendResponse(exchange, 404, null);
+            }
+            return;
+        }
+        // Manage PUT /tasks/{id}
+        if ("PUT".equals(method) && m.matches()) {
+            int id = Integer.parseInt(m.group(1));
+            if (dao.findById(id).isEmpty()) {
+                sendResponse(exchange, 404, null);
+                return;
+            }
+            String body = new String(exchange.getRequestBody().readAllBytes(), UTF_8);
+            Task input = JsonUtils.deserialize(body, Task.class);
+
+            Task updatedTask = new Task(id, input.title(), input.description(), input.done());
+            dao.save(updatedTask);
+            sendResponse(exchange, 204, null);
+            return;
+        }
+
+    //endregion
+
 
         // Otherwise → 404
         sendResponse(exchange, 404, null);
