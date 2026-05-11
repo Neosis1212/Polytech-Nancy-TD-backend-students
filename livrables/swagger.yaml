@@ -2,18 +2,32 @@ openapi: 3.0.3
 info:
     title: TODO API
     version: 1.0.0
-    description: >
-        API de gestion d'une TODO List.
+    description: API de gestion d'une TODO List.
 servers:
-    -   url: http://localhost:8080
-        description: Serveur local de développement
+    - url: http://localhost:8080
+      description: Serveur local de développement
 
 tags:
-    -   name: tasks
-        description: Opérations sur les tâches
+    - name: tasks
+      description: Opérations sur les tâches
 
 paths:
     /tasks:
+        get:
+            tags: [ tasks ]
+            summary: Récupérer toutes les tâches
+            parameters:
+                - name: todo-only
+                  in: query
+                  description: Si vrai, ne retourne que les tâches non terminées
+                  schema:
+                      type: boolean
+            responses:
+                '200':
+                    description: Liste des tâches
+                '204':
+                    description: Aucune tâche trouvée
+
         post:
             tags: [ tasks ]
             summary: Créer une tâche
@@ -40,13 +54,13 @@ paths:
 
     /tasks/{id}:
         parameters:
-            -   in: path
-                name: id
-                required: true
-                description: Identifiant numérique de la tâche
-                schema:
-                    type: integer
-                    minimum: 1
+            - in: path
+              name: id
+              required: true
+              description: Identifiant numérique de la tâche
+              schema:
+                  type: integer
+                  minimum: 1
         get:
             tags: [ tasks ]
             summary: Récupérer une tâche
@@ -61,6 +75,41 @@ paths:
                                 $ref: '#/components/schemas/Task'
                 '404':
                     description: Tâche non trouvée
+
+        put:
+            tags: [ tasks ]
+            summary: Modifier une tâche
+            parameters:
+                - name: id
+                  in: path
+                  required: true
+                  schema:
+                      type: integer
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/Task'
+            responses:
+                '204':
+                    description: Mise à jour réussie
+                '404':
+                    description: Tâche non trouvée
+        delete:
+            tags: [ tasks ]
+            summary: Supprimer une tâche
+            parameters:
+                - name: id
+                  in: path
+                  required: true
+                  schema:
+                      type: integer
+            responses:
+                '204':
+                    description: Supprimée avec succès
+                '404':
+                    description: Tâche non trouvée
+
 components:
     schemas:
         Task:
