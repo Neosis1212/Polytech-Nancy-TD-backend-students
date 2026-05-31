@@ -11,7 +11,7 @@ import java.util.Optional;
 
 public class TaskDao {
     private static final Logger log = LoggerFactory.getLogger(TaskDao.class);
-    // Le fichier SQLite sera créé à la racine
+    // On utiliise  SQLite 
     private static final String DB_URL = "jdbc:sqlite:todoapp.db";
 
     public TaskDao() {
@@ -88,7 +88,7 @@ public class TaskDao {
      * Sauvegarde une tâche (Insert si id = 0, sinon Update).
      */
     public Task save(Task task) {
-        // Si l'ID est 0 (ou null selon comment ton modèle est fait), on crée une nouvelle tâche
+        // Si l'ID est 0 (ou null), on crée une nouvelle tâche
         if (task.getId() == 0) {
             String sql = "INSERT INTO tasks (title, description, done) VALUES (?, ?, ?)";
 
@@ -103,7 +103,7 @@ public class TaskDao {
 
                 try (ResultSet generatedKeys = pstmt.getGeneratedKeys()) {
                     if (generatedKeys.next()) {
-                        task.setId(generatedKeys.getInt(1)); // Assure-toi d'avoir un setter setId() dans ta classe Task
+                        task.setId(generatedKeys.getInt(1)); 
                         log.debug("Tâche créée avec l'ID: " + task.getId());
                     }
                 }

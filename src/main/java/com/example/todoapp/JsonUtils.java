@@ -7,7 +7,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
 
 /**
- * JSON serialization and deserialization utility class.
+ * Serialisation et désérialisation JSON .
  */
 public final class JsonUtils {
 
@@ -15,13 +15,13 @@ public final class JsonUtils {
             .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 
     /**
-     * Private constructor.
+     * Constructeur privé.
      */
     private JsonUtils() {
     }
 
     /**
-     * Serialize object to JSON.
+     * Sérialiser un objet Java en JSON.
      *
      * @param o object to serialize.
      * @return JSON representation of the object.
@@ -31,11 +31,11 @@ public final class JsonUtils {
     }
 
     /**
-     * Deserialize JSON to Java object.
-     * @param json  JSON to deserialize
-     * @param clazz Java type of the object to deserialize
-     * @param <T>   Type of the deserialized object
-     * @return      Deserialized object
+     * désérialiser un JSON en objet Java.
+     * @param json  
+     * @param clazz 
+     * @param <T>   
+     * @return      
      */
     public static <T> T deserialize(String json, Class<T> clazz) throws IOException {
         return MAPPER.readValue(json, clazz);

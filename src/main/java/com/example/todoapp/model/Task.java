@@ -7,7 +7,7 @@ public class Task {
     private boolean done;
 
     public Task() {
-        // Constructeur vide  pour la conversion JSON (Jackson)
+        // Constructeur vide  pour la conversion JSON 
     }
 
     public Task(Integer id, String title, String description, boolean done) {
